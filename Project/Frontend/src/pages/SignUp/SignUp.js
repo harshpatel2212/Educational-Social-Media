@@ -24,6 +24,7 @@ export const SignUp = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPasswordMatched(true);
+    setUserExist(false);
     if (name === "username") {
       setUserExist(false);
     }
@@ -41,8 +42,7 @@ export const SignUp = () => {
     if (details.password !== details.confirm_password) {
       setPasswordMatched(false);
       return;
-    }
-    else if(!details.birthplace.trim()){
+    } else if (!details.birthplace.trim()) {
       alert("Please Enter correct BirthPlace");
       return;
     }
@@ -60,31 +60,37 @@ export const SignUp = () => {
       description: details.description,
     };
     try {
-      const response1 = await fetch(`http://localhost:5000/user/register`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify(personalDetails),
-      })
+      const response1 = await fetch(
+        `${process.env.REACT_APP_FINAL}/user/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          mode: "cors",
+          body: JSON.stringify(personalDetails),
+        }
+      );
       const data1 = await response1.json();
 
-      const response2 = await fetch(`http://localhost:5000/user/createProfile`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        mode: "cors",
-        body: JSON.stringify(profileDetails),
-      })
+      const response2 = await fetch(
+        `${process.env.REACT_APP_FINAL}/user/createProfile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          mode: "cors",
+          body: JSON.stringify(profileDetails),
+        }
+      );
 
       const data2 = await response2.json();
 
-      if(!data1.success){
+      if (!data1.success) {
         setUserExist(true);
-      }else{
-        if(data2.success){
+      } else {
+        if (data2.success) {
           setProfileCreated(true);
           navigate(0);
         }
@@ -209,11 +215,16 @@ export const SignUp = () => {
               name="about"
               value={details.about}
               required
+              multiline
               placeholder="Enter about yourself"
               type="text"
               fullWidth
               onChange={handleChange}
-            ></TextField>
+            />
+            <Typography>
+              Letter Count:{details.about.length}/500
+            </Typography>
+
             <TextField
               variant="filled"
               label="Enter description"
@@ -223,8 +234,12 @@ export const SignUp = () => {
               placeholder="Enter description"
               type="text"
               fullWidth
+              multiline
               onChange={handleChange}
-            ></TextField>
+            />
+            <Typography>
+              Letter Count:{details.description.length}/100
+            </Typography>
             <Button
               type="submit"
               variant="contained"

@@ -1,41 +1,91 @@
-import React from "react";
+import React, { useState } from "react";
 import { Paper, Grid, Avatar, TextField, Button } from "@mui/material";
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { Link } from 'react-router-dom';
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import { useNavigate } from "react-router-dom";
 
 export const Passwordchangeq = () => {
- const paperStyle = { padding: 20,
+  const navigate = useNavigate();
+  const [details, setDetails] = useState({
+    username: "",
+    birthplace: "",
+  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDetails((prevState) => {
+      return {
+        ...prevState,
+        [name]: value,
+      };
+    });
+  };
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    fetch(`${process.env.REACT_APP_FINAL}/user/forget`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(details),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          localStorage.setItem("username", details.username);
+          navigate("/fp");
+        } else {
+          alert(data.error);
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+  const paperStyle = {
+    padding: 20,
     height: "auto",
     width: "20%",
-    margin: "2% 38%",};
+    margin: "auto",
+    marginTop: "1em",
+  };
   const avatarStyle = { backgroundColor: "#1bbd7e" };
   const buttonStyle = { margin: "8px 0" };
   return (
     <div>
-      <Grid>
-        <Paper elevation={20} style={paperStyle}>
+      <Grid container>
+        <Paper
+          elevation={20}
+          style={paperStyle}
+          component={Grid}
+          xs={10}
+          sm={6}
+          md={3}
+        >
           <Grid align="center">
-            <Grid item xs={12} sm={6} md={3}></Grid>
             <Avatar style={avatarStyle}>
               <HomeOutlinedIcon />
             </Avatar>
             <h2>Answer this Question</h2>
           </Grid>
-          {/* <TextField
+          <TextField
             variant="filled"
             label="Username"
+            name="username"
+            value={details.username}
             required
             placeholder="Enter username"
-            fullWidth="true"
-            margin="10 px"
-          ></TextField> */}
+            fullWidth
+            onChange={handleChange}
+          ></TextField>
           <TextField
             variant="filled"
             label="What is your birth place?"
-            required
+            value={details.birthplace}
+            name="birthplace"
             placeholder="Enter place of birth"
             type="text"
-            fullWidth="true"
+            fullWidth
+            onChange={handleChange}
           ></TextField>
           {/* <TextField
             variant="filled"
@@ -49,11 +99,11 @@ export const Passwordchangeq = () => {
             type="submit"
             variant="contained"
             color="primary"
-            fullWidth="true"
+            fullWidth
             style={buttonStyle}
+            onClick={handlePasswordSubmit}
           >
-            <Link to="/fp" style={{ textDecoration: 'none' , color:'white'}}>Submit</Link>
-            
+            Submit
           </Button>
         </Paper>
       </Grid>

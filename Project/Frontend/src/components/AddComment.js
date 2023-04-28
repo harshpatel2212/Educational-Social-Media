@@ -7,6 +7,8 @@ import { Button } from "@mui/material/";
 
 const AddComment = (props) => {
   const { item } = props;
+  const user_id = props.user;
+  console.log(user_id);
 
   const [text, setText] = React.useState("");
   const addEmoji = (emoji) => () => setText(`${text}${emoji}`);
@@ -23,7 +25,7 @@ const AddComment = (props) => {
   };
 
   const handleAddComment = (item) => {
-    fetch(`http://localhost:7000/post/addComment`, {
+    fetch(`${process.env.REACT_APP_FINAL}/post/addComment`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",

@@ -4,16 +4,15 @@ import {
   CardContent,
   Typography,
   CardActions,
-  CardMedia,
   CardHeader,
   Avatar,
   IconButton,
+  Divider,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCommentIcon from "@mui/icons-material/AddComment";
-import ImageUrl from "../static";
 import DOMPurify from "dompurify";
 import Collapse from "@mui/material/Collapse";
 import red from "@mui/material/colors/red";
@@ -35,8 +34,22 @@ const ExpandMore = styled((props) => {
 const PostCards = (props) => {
   const { item, comments } = props;
   user_id = props.user;
+
+  const handlePostLike = (liked, user_id) => {
+    {
+      for (let i = 0; i < liked.length; i++) {
+        if (liked[i].user_id === user_id) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  // let initialLike = handlePostLike(item.likes, user_id);
   const [expanded, setExpanded] = React.useState(false);
-  const [liked, setLiked] = React.useState(false);
+  const [liked, setLiked] = React.useState(() => handlePostLike(item.likes, user_id));
+  console.log(liked, "DEKHLE BHAI");
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
@@ -49,7 +62,7 @@ const PostCards = (props) => {
   };
 
   const handleDeletePost = (item) => {
-    fetch(`http://localhost:7000/post/deletePost`, {
+    fetch(`${process.env.REACT_APP_FINAL}/post/deletePost`, {
       method: "DELETE",
       headers: {
         "Content-type": "application/json",
@@ -71,7 +84,7 @@ const PostCards = (props) => {
   };
 
   const handleAddLike = () => {
-    fetch(`http://localhost:7000/post/addLike`, {
+    fetch(`${process.env.REACT_APP_FINAL}/post/addLike`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -86,7 +99,7 @@ const PostCards = (props) => {
   };
 
   const handleRemoveLike = () => {
-    fetch(`http://localhost:7000/post/removeLike`, {
+    fetch(`${process.env.REACT_APP_FINAL}/post/removeLike`, {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -106,7 +119,8 @@ const PostCards = (props) => {
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
+            {item.user_id !== undefined ? item.user_id[0] : "N"}
+            {/* {console.log(item.user_id[0])} */}
           </Avatar>
         }
         action={
@@ -118,12 +132,13 @@ const PostCards = (props) => {
         }
         title={item.user_id}
       />
-      <CardMedia
+      {/* <CardMedia
         component="img"
         alt="green iguana"
         height="200"
         image={ImageUrl}
-      />
+      /> */}
+      <Divider />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {item.title}
@@ -134,6 +149,7 @@ const PostCards = (props) => {
           dangerouslySetInnerHTML={{ __html: item.description }}
         ></Typography>
       </CardContent>
+      <Divider />
       <CardActions disableSpacing>
         {liked && (
           <IconButton aria-label="add to favorites" onClick={handleRemoveLike}>
@@ -157,9 +173,9 @@ const PostCards = (props) => {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>Comments:{comments.length}</Typography>
-          <AddComment item={item} user={user_id}/>
+          <AddComment item={item} user={user_id} />
           {comments.map((comment) => (
-            <Comment item={comment}  />
+            <Comment item={comment} />
           ))}
         </CardContent>
       </Collapse>
